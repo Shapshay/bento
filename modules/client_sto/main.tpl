@@ -26,6 +26,5 @@
 	</div>
 <p align="center">
 <input type="hidden" name="call_lenght2" id="call_lenght2" value="0" />
-<button class="pole_sav" onclick="javascript:SaveSTO();"></button>
 </p>
 </diV>

@@ -88,7 +88,7 @@ if(!isset($_GET['item'])&&!isset($_SESSION['1C'])&&!isset($_SESSION['c_id'])){
 	}
 	$number = $c_arr['Telnumber'];
     if(getClientPhoneID($c_id, $number)==0){
-        $dbc->element_create("phones", array(
+        $dbc->element_create("calls_log", array(
             "client_id" => $c_id,
             "phone" => $number));
     }

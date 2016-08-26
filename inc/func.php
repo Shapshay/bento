@@ -548,6 +548,13 @@ function getClientID($code_1C) {
 	return $row['id'];
 }
 
+// ID STO-клиента по коду 1С
+function getClientSTOID($code_1C) {
+	global $dbc;
+	$row = $dbc->element_find_by_field('sto','code_1C',$code_1C);
+	return $row['id'];
+}
+
 // ID POST-клиента по коду 1С
 function getPostClientID($code_1C) {
 	global $dbc;

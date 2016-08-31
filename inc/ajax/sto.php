@@ -213,7 +213,44 @@ else{
             $out_row['res'] = 1;
             break;
         case 'sum':
+            $cost = array();
+            //print_r($_POST);
+            foreach ($_POST as $key=>$v){
+                $cost[$key] = base64_decode($v);
+            }
+            $code_sto = $cost['sto_code'];
+            unset($cost['type']);
+            unset($cost['id']);
+            unset($cost['sto_tochka_id']);
+            unset($cost['controller']);
+            unset($cost['action']);
+            unset($cost['sto_code']);
+            //print_r($cost);
+            $row2 = $dbc->element_find_by_field('sto_tochka','code',$code_sto);
 
+            $dbc->element_create('costs',array(
+                "sto_tochka_id" => $row2['id'],
+                "title" => $cost['title'],
+                "summa" => $cost['summa'],
+                "date_cost" => $cost['date_cost']
+            ));
+
+            ini_set("soap.wsdl_cache_enabled", "0" );
+            $client2 = new SoapClient("http://192.168.0.220/akk/ws/wsakkto.1cws?wsdl",
+                array(
+                    'login' => 'ws',
+                    'password' => '123456',
+                    'trace' => true
+                )
+            );
+
+            $params2["Rashod"]["Name"] = $cost['title'];
+            $params2["Rashod"]["Sto"] = $code_sto;
+            $params2["Rashod"]["Summa"] = $cost['summa'];
+            //print_r($params2);
+            $result = $client2->SaveRashod($params2);
+
+            $out_row['res'] = 1;
             break;
     }
 }

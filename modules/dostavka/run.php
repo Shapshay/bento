@@ -47,68 +47,86 @@ if(isset($_POST['polis_ot_cour'])&&($_POST['polis_ot_cour']==1)&&isset($_POST['P
 	$pol_arr = '';
 	foreach($_POST['PolCheck2'] as $v){
 
-        $row = $dbc->element_find('polises',$v);
-        ini_set("soap.wsdl_cache_enabled", "0" );
-        $client2 = new SoapClient("http://192.168.0.220/akk/ws/wsphp.1cws?wsdl",
-            array(
-                'login' => 'ws',
-                'password' => '123456',
-                'trace' => true
-            )
-        );
-        $params2["PolicNumber"] = $row['bso_number'];
-        $result = $client2->GetPolicInfo($params2);
-        $array_info = objectToArray($result);
-        //print_r($array_info);
-        $res_sum = $array_info['return']['PolicInfo']['Summa'];
-        $dbc->element_update('polises',$v,array(
-            "summa" => $res_sum));
-        $row2 = $dbc->element_find('polises',$v);
-		if($row2['status']!=7){
-			$dbc->element_create("alert_mobil_cour",array(
-				"cour_id" => $_POST['c_id'],
-				"bso" => $row2['bso_number'],
-				"status" => $row2['status'],
-				"date" => 'NOW()'));
-		}
-
-
-		$dbc->element_update('polises',$v,array(
-			"status" => 4,
-			"date_kassa" => 'NOW()'));
-		$SQL = "UPDATE cour_polis SET
-			stat_ok = 1
-			WHERE 
-			c_id = ".$_POST['c_id']." AND 
-			polis_id = ".$v;
-		$dbc->element_free_update($SQL);
-		$pol_arr.= $v.',';
-        ini_set("soap.wsdl_cache_enabled", "0" );
-        $client = new SoapClient("http://192.168.0.220/akk/ws/wsphp.1cws?wsdl",
-            array(
-                'login' => 'ws',
-                'password' => '123456',
-                'trace' => true
-            )
-        );
-        //$params["Code1C"] = LOGIN_1C;
-        $rows = $dbc->dbselect(array(
-                "table"=>"cour_polis",
-                "select"=>"users.login_1C as cour_1C,
+		ini_set("soap.wsdl_cache_enabled", "0" );
+		$client = new SoapClient("http://192.168.0.220/akk/ws/wsphp.1cws?wsdl",
+			array(
+				'login' => 'ws',
+				'password' => '123456',
+				'trace' => true
+			)
+		);
+		//$params["Code1C"] = LOGIN_1C;
+		$rows = $dbc->dbselect(array(
+				"table"=>"cour_polis",
+				"select"=>"users.login_1C as cour_1C,
 			        polises.bso_number as bso_number",
-                "joins"=>"LEFT OUTER JOIN users ON users.id = cour_polis.c_id
+				"joins"=>"LEFT OUTER JOIN users ON users.id = cour_polis.c_id
                     LEFT OUTER JOIN polises ON polises.id = cour_polis.polis_id",
-                "where"=>"cour_polis.c_id = ".$_POST['c_id']." AND cour_polis.polis_id = ".$v,
-                "limit"=>1
-            )
-        );
-        $row = $rows[0];
-        $params["polic_numbers"]["PolicNumber"] = $row['bso_number'];
-        $params["manager_code"] = $row['cour_1C'];
-        $result = $client->PolicCash($params);
-        $array_save = objectToArray($result);
-        $res_save_1c = $array_save['return'];
-        print_r($res_save_1c);
+				"where"=>"cour_polis.c_id = ".$_POST['c_id']." AND cour_polis.polis_id = ".$v,
+				"limit"=>1
+			)
+		);
+		$row = $rows[0];
+		$params["polic_numbers"]["PolicNumber"] = $row['bso_number'];
+		$params["manager_code"] = $row['cour_1C'];
+		$result = $client->PolicCash($params);
+		$array_save = objectToArray($result);
+		$res_save_1c = $array_save['return'];
+		if($res_save_1c=='Успешно'){
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			$row = $dbc->element_find('polises',$v);
+			ini_set("soap.wsdl_cache_enabled", "0" );
+			$client2 = new SoapClient("http://192.168.0.220/akk/ws/wsphp.1cws?wsdl",
+				array(
+					'login' => 'ws',
+					'password' => '123456',
+					'trace' => true
+				)
+			);
+			$params2["PolicNumber"] = $row['bso_number'];
+			$result = $client2->GetPolicInfo($params2);
+			$array_info = objectToArray($result);
+			//print_r($array_info);
+			$res_sum = $array_info['return']['PolicInfo']['Summa'];
+			$dbc->element_update('polises',$v,array(
+				"summa" => $res_sum));
+			$row2 = $dbc->element_find('polises',$v);
+			if($row2['status']!=7){
+				$dbc->element_create("alert_mobil_cour",array(
+					"cour_id" => $_POST['c_id'],
+					"bso" => $row2['bso_number'],
+					"status" => $row2['status'],
+					"date" => 'NOW()'));
+			}
+	
+	
+			$dbc->element_update('polises',$v,array(
+				"status" => 4,
+				"date_kassa" => 'NOW()'));
+			$SQL = "UPDATE cour_polis SET
+				stat_ok = 1
+				WHERE 
+				c_id = ".$_POST['c_id']." AND 
+				polis_id = ".$v;
+			$dbc->element_free_update($SQL);
+			$pol_arr.= $v.',';
+		
+		
+		}
+        else{
+            print_r($res_save_1c);
+            break;
+        }
+        
+
     }
 	echo '<script type="text/javascript">window.open("http://'.$_SERVER['HTTP_HOST'].'/inc/ajax/pdf.php?pdf_type=c_p_in&c_id='.$_POST['c_id'].'&pol_arr='.$pol_arr.'");</script>';
 }

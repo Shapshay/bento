@@ -915,11 +915,86 @@ $POST_ROWS.= '</tbody>
 echo $POST_ROWS;
 
 #############################################################
+
+$rows = $dbc->dbselect(array(
+    "table"=>"sto",
+    "select"=>"DATE_FORMAT(sto.date_call,'%Y%m%d') as date_call,
+            COUNT(sto.id) as call_count,
+            SUM(CASE WHEN sto.res_call_id='1' THEN 1 ELSE 0 END) as status1,
+            SUM(CASE WHEN sto.res_call_id='2' THEN 1 ELSE 0 END) as status2,
+            SUM(CASE WHEN sto.res_call_id='3' THEN 1 ELSE 0 END) as status3,
+            SUM(CASE WHEN sto.res_call_id='4' THEN 1 ELSE 0 END) as status4,
+            SUM(CASE WHEN sto.res_call_id='5' THEN 1 ELSE 0 END) as status5",
+    "where"=>"DATE_FORMAT(sto.date_call,'%Y%m%d')='".date("Ymd")."'",
+    "group"=>"date_call"));
+
+
+
+
+
+$STO_ROWS = '<p>&nbsp;</p>
+    <p><strong>Таблица СТО</strong></p>
+	<p><table border=1>
+	    <thead>
+        <tr>
+            <th rowspan="2">Кол-во приехавших</th>
+            <th rowspan="2">Кол-во неприехавших</th>
+            <th rowspan="2">Количество звонков</th>
+            <th colspan="5">Статистика</th>
+        </tr>
+        <tr>
+            <th>Отработан</th>
+            <th>Недозвон</th>
+            <th>Ошибка номера</th>
+            <th>Перезвонить</th>
+            <th>Отказ</th>
+        </tr>
+        </thead>
+        <tbody id="table_rows">';
+$numRows = $dbc->count;
+if ($numRows > 0) {
+	foreach($rows as $row){
+
+        $rows2 = $dbc->dbselect(array(
+            "table"=>"sto",
+            "select"=>"SUM(CASE WHEN sto.visit='1' THEN 1 ELSE 0 END) as ok",
+            "where"=>"DATE_FORMAT(sto.date_visit,'%Y%m%d')='".date("Ymd")."'"));
+        $row2 = $rows2[0];
+        $rows3 = $dbc->dbselect(array(
+            "table"=>"sto",
+            "select"=>"SUM(CASE WHEN sto.visit='0' THEN 1 ELSE 0 END) as err",
+            "where"=>"DATE_FORMAT(sto.date_dog,'%Y%m%d')='".date("Ymd")."'"));
+        $row3 = $rows3[0];
+        
+        $STO_ROWS.='<tr>
+                    <td>'.$row2['ok'].'</td>
+                    <td>'.$row3['err'].'</td>
+                    <td>'.$row['call_count'].'</td>
+                    <td>'.$row['status1'].'</td>
+                    <td>'.$row['status2'].'</td>
+                    <td>'.$row['status3'].'</td>
+                    <td>'.$row['status4'].'</td>
+                    <td>'.$row['status5'].'</td>
+                    </tr>';
+	}
+}
+else{
+    $STO_ROWS.='<tr>
+			<td colspan="8" align="center"><strong>Нет данных за этот период !</strong></td>
+			</tr>';
+}
+$STO_ROWS.= '</tbody>
+    </table>
+    </p></p>';
+
+echo $STO_ROWS;
+
+#############################################################
 $_sendTo = 'tigay84@list.ru';
 $_sendFrom = 'send@kazavtoclub.kz';
 $_mailSubject = 'Отчеты Bento';
 $_mailFrom = "Bento CRM";
-$mail_body = $MAIN_TABLE.$BACK_TABLE.$SUPERVISER_ROWS.$PRAYNIK_ROWS.$POST_ROWS;
+$mail_body = $MAIN_TABLE.$BACK_TABLE.$SUPERVISER_ROWS.$PRAYNIK_ROWS.$POST_ROWS.$STO_ROWS;
 sendMail3('tigay84@list.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
 sendMail3('mtyrlybekova@mail.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
 sendMail3('hr@kazavtoclub.kz', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);

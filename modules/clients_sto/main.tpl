@@ -48,7 +48,8 @@
 <input type="text" name="email" value="{U_EMAIL}" id="name" class="pole_vvoda" style="padding-left:10px;">
 <p><strong>Дата окончания ТО</strong><br>
 <input type="text" name="date_to_end" id="date_to_end" value="{U_DATE_PREV_TO}" style="width:200px;padding-left:10px;" readonly="readonly" class="{PREV_TO_COLOR}">
-<button type="button" class="btn_pero_mini" onclick="javascript:displayCalendar(document.s_s.date_to_end,'dd-mm-yyyy',this,false);">{STR_SELECT}</button>
+<button type="button" class="btn_pero_mini" onclick="javascript:displayCalendar(document.s_s.date_to_end,'dd-mm-yyyy',this,false);">{STR_SELECT}</button><br>
+        <button type="button" class="btn_cour" onclick="checkDateTO();">Получить дату</button>
 <p><strong>Гос.номер:</strong><br>
 <input type="text" name="gn" value="{U_GN}" id="tech_gn" style="width:200px;padding-left:10px;" class="pole_vvoda">
 <p><strong>Тех.паспорт:</strong><br>

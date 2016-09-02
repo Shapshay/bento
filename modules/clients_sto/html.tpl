@@ -83,4 +83,28 @@ function changeResCall(){
         $('.stoDivOtrab').show();
     }
 }
+
+function checkDateTO() {
+    $('#waitGear').show();
+    var gn = $('#tech_gn').val();
+    var CLIENT_ID = {CLIENT_ID};
+    if(gn!='') {
+        $.post("modules/clients_sto/check_date.php", {gn: gn, CLIENT_ID: CLIENT_ID},
+                function(data){
+                    //alert(data);
+                    var obj = jQuery.parseJSON(data);
+                    if(obj.result=='OK'){
+                        $('#date_to_end').val(obj.tech_date);
+                        swal("Обновлено!", "Дата окончания ТО обновлена", "success");
+                    }
+                    else{
+                        swal("Ошибка", "Сбой отправки!", "error");
+                    }
+                });
+    }
+    else{
+        swal("Ошибка заполнения!", "Проверте заполнение поля Гос.номер!", "error");
+    }
+    $('#waitGear').hide();
+}
 </script>

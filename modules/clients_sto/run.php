@@ -177,6 +177,7 @@ if(isset($c_id)){
 	$row = $dbc->element_find('sto',$c_id);
 
 	$tpl->assign("CLIENT_CODE_1C", $row['code_1C']);
+    $tpl->assign("CLIENT_ID", $row['id']);
 	$tpl->assign("U_NAME", $row['name']);
 	$tpl->assign("U_GN", $row['gn']);
 	$tpl->assign("U_PN", $row['pn']);

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Skiv
- * Date: 17.08.2016
- * Time: 11:58
+ * Date: 01.09.2016
+ * Time: 9:04
  */
 error_reporting (E_ALL);
 ini_set("display_errors", 1);
@@ -531,260 +531,30 @@ class BDfunc
 
 }
 
-
-?>
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>Отчет <?php echo date("d-m-Y"); ?></title>
-    </head>
-    <body>
-<?php
 error_reporting (E_ALL);
 ini_set("display_errors", 1);
 date_default_timezone_set ("Asia/Almaty");
-require_once('/var/www/html/perch/phpmailer/class.phpmailer.php');
-include("/var/www/html/perch/phpmailer/class.smtp.php");
 $dbc = new BDFunc;
-//date_default_timezone_set ("Asia/Almaty");
-//*********FUNCTIONS*********************************************************/
-// Отправляем письмо
-function sendMail3($mail_to, $subject, $body, $sender_name = "", $sender_mail = "") {
-    $mail = new PHPMailer();
-    $mail->IsSMTP(); // telling the class to use SMTP
-    $mail->Host       = "185.98.6.157"; // SMTP server
-    $mail->SMTPDebug  = 0;                     // enables SMTP debug information (for testing)
-    // 1 = errors and messages
-    // 2 = messages only
-    $mail->SMTPAuth   = true;                  // enable SMTP authentication
-    $mail->Host       = "185.98.6.157"; // sets the SMTP server
-    $mail->Port       = 25;                    // set the SMTP port for the GMAIL server
-    $mail->Username   = "send@kazavtoclub.kz"; // SMTP account username
-    $mail->Password   = "Av3toc7lu5d";        // SMTP account password
 
-    $mail->SetFrom($sender_mail, $sender_name);
+##############################################################################################
 
-    $mail->AddReplyTo($sender_mail,$sender_name);
-
-    $mail->Subject    = $subject;
-
-    $mail->AltBody    = "12345"; // optional, comment out and test
-
-    $body             = $body;
-
-    $mail->MsgHTML($body);
-
-    $mail->AddAddress($mail_to, 'Subscriber');
-
-    if(!$mail->Send()) {
-        $sql = "Mailer Error: " . $mail->ErrorInfo;
-    } else {
-        $sql = "Message sent!";
-    }
-
-    if($sql==''){
-        $sql = "TEST";
-    }
-    return $sql;
-}
-
-// SOAP
-function objectToArray($d) {
-    if (is_object($d)) {
-        // Gets the properties of the given object
-        // with get_object_vars function
-        $d = get_object_vars($d);
-    }
-    if (is_array($d)) {
-        /*
-        * Return array converted to object
-        * Using __FUNCTION__ (Magic constant)
-        * for recursive call
-        */
-        return array_map(__FUNCTION__, $d);
-    }
-    else {
-        // Return array
-        return $d;
-    }
-}
-function stdToArray($obj){
-    $rc = (array)$obj;
-    foreach($rc as $key => &$field){
-        if(is_object($field))$field = $this->stdToArray($field);
-    }
-    return $rc;
-}
-
-function PolisCourName($p_id) {
-    global $dbc;
-    $row = $dbc->element_find_by_field('cour_polis','polis_id',$p_id);
-    $numRows = $dbc->count;
-    if ($numRows > 0) {
-        $row2 = $dbc->element_find('users',$row['c_id']);
-        $numRows = $dbc->count;
-        if ($numRows > 0) {
-            return $row2['name'];
-        }
-        else{
-            return 0;
-        }
-    }
-    else{
-        return 0;
-    }
-}
-
-//*** MAIN ****************************************************************************/
-$SEND = false;
-$PRINT_TABLE = "";
-$INDOST_TABLE = "";
-$COUR_TABLE = "";
-
-
-// print
 $rows = $dbc->dbselect(array(
-        "table"=>"polises",
-        "select"=>"polises.bso_number as bso_number,
-            polises.date_write as date_write,
-            polises.date_start as date_start",
-        "where"=>"polises.status = 1 AND
-            DATE_ADD(polises.date_write, INTERVAL 30 MINUTE) < NOW() AND
-            polises.office_id = 1 AND 
-            DATE_FORMAT(polises.date_write,'%Y%m%d')>20160821"
-    )
-);
-
+    "table"=>"sto",
+    "select"=>"sto_tochka.title as sto_name,
+            sto.date_dog as date_dog,
+            sto.phone as phone,
+            sto.gn as gn,
+            users.name as oper",
+    "joins"=>"LEFT OUTER JOIN sto_tochka ON sto.sto_tochka_id = sto_tochka.id
+        LEFT OUTER JOIN users ON sto.sto_tochka_id = users.id",
+    "where"=>"sto.visit = 0
+            AND DATE_FORMAT(sto.date_dog,'%Y%m%d')='".date("Ymd")."'"));
+$sql = $dbc->outsql;
 $numRows = $dbc->count;
-if($numRows){
-    $SEND = true;
-    $PRINT_TABLE = '<p><strong>Не распечатано более получаса</strong></p>
-		<p>
-		<table border=1>
-		<thead>
-		<tr>
-		<th width="400"><b>БСО</b></th>
-		<th width="100"><b>Дата выписки</b></th>
-		<th width="100"><b>Дата начала действия</b></th>
-		</tr>
-		</thead>
-		<tbody>';
-    foreach($rows as $row){
-        $PRINT_TABLE.='<tr>
-			<td>'.$row['bso_number'].'</td>
-			<td>'.$row['date_write'].'</td>
-			<td>'.date("d-m-Y",strtotime($row['date_start'])).'</td>
-			</tr>';
+if ($numRows > 0) {
+    foreach ($rows as $row) {
+        $sms_body = urlencode('Напоминаем, что на сегодня у Вас запланирован тех.осмотр. Автоклуб');
+        $sms_url = "http://smsc.kz//sys/send.php?login=Tigay84@list.ru&psw=94120593&&phones=".$row['phone']."&charset=utf-8&mes=".$sms_body;
+        $result = get_web_page( $sms_url );
     }
-    $PRINT_TABLE.='</tbody>
-	    </table><p></p>';
 }
-
-// indost
-$rows = $dbc->dbselect(array(
-        "table"=>"polises",
-        "select"=>"polises.bso_number as bso_number,
-            polises.date_print as date_print,
-            polises.date_dost as date_dost,
-            polises.date_start as date_start",
-        "where"=>"polises.status = 2 AND
-            DATE_ADD(polises.date_print, INTERVAL 3 DAY) < NOW() AND
-            polises.office_id = 1 AND 
-            DATE_FORMAT(polises.date_write,'%Y%m%d')>20160821"
-    )
-);
-$numRows = $dbc->count;
-if($numRows){
-    $SEND = true;
-    $INDOST_TABLE = '<p><strong>Не назначен курьер более 3х суток</strong></p>
-		<p>
-		<table border=1>
-		<thead>
-		<tr>
-		<th width="400"><b>БСО</b></th>
-		<th width="100"><b>Дата распечатки</b></th>
-		<th width="100"><b>Дата доставки</b></th>
-		<th width="100"><b>Дата начала действия</b></th>
-		</tr>
-		</thead>
-		<tbody>';
-    foreach($rows as $row){
-        $INDOST_TABLE.='<tr>
-			<td>'.$row['bso_number'].'</td>
-			<td>'.$row['date_print'].'</td>
-			<td>'.date("d-m-Y",strtotime($row['date_dost'])).'</td>
-			<td>'.date("d-m-Y",strtotime($row['date_start'])).'</td>
-			</tr>';
-    }
-    $INDOST_TABLE.='</tbody>
-	    </table><p></p>';
-}
-
-// cour
-$rows = $dbc->dbselect(array(
-        "table"=>"polises",
-        "select"=>"polises.id as p_id,
-            polises.bso_number as bso_number,
-            polises.date_indost as date_indost,
-            polises.date_dost as date_dost,
-            polises.date_start as date_start",
-        "where"=>"polises.status = 3 AND
-            DATE_ADD(polises.date_indost, INTERVAL 3 DAY) < NOW() AND
-            polises.office_id = 1 AND 
-            DATE_FORMAT(polises.date_write,'%Y%m%d')>20160821"
-    )
-);
-$numRows = $dbc->count;
-if($numRows){
-    $SEND = true;
-    $COUR_TABLE = '<p><strong>Полис у курьера более 3х суток</strong></p>
-		<p>
-		<table border=1>
-		<thead>
-		<tr>
-		<th width="400"><b>БСО</b></th>
-		<th width="400"><b>Курьер</b></th>
-		<th width="100"><b>Дата выдачи курьеру</b></th>
-		<th width="100"><b>Дата доставки</b></th>
-		<th width="100"><b>Дата начала действия</b></th>
-		</tr>
-		</thead>
-		<tbody>';
-    foreach($rows as $row){
-        $COUR_TABLE.='<tr>
-			<td>'.$row['bso_number'].'</td>
-			<td>'.PolisCourName($row['p_id']).'</td>
-			<td>'.$row['date_indost'].'</td>
-			<td>'.date("d-m-Y",strtotime($row['date_dost'])).'</td>
-			<td>'.date("d-m-Y",strtotime($row['date_start'])).'</td>
-			</tr>';
-    }
-    $COUR_TABLE.='</tbody>
-	    </table><p></p>';
-}
-
-
-#############################################################
-if($SEND) {
-    $_sendTo = 'tigay84@list.ru';
-    $_sendFrom = 'send@kazavtoclub.kz';
-    $_mailSubject = 'Красные полисы Bento CRM';
-    $_mailFrom = "Bento CRM";
-    $mail_body = $PRINT_TABLE . $INDOST_TABLE . $COUR_TABLE;
-    sendMail3('tigay84@list.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    sendMail3('mtyrlybekova@mail.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    sendMail3('hr@kazavtoclub.kz', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    //sendMail3('skiv_80@mail.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    sendMail3('e.kharitonova777@gmail.com', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    sendMail3('aida_89__@mail.ru', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    //$test = sendMail3('skiv.weber@gmail.com', $_mailSubject, $mail_body, $_mailFrom, $_sendFrom);
-    //echo "<p>ОК = " . $test . "</p>";
-}
-else{
-    echo "<p>Просрочек нет</p>";
-}
-?>
-
-</body>
-</html>

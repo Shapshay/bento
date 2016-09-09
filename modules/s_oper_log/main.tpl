@@ -11,6 +11,7 @@
         <select name="prod" id="prod" onchange="changeOperType();">
             <option value="1">ТД</option>
             <option value="2">Продажники</option>
+            <option value="11">СТО</option>
         </select></p>
     <p><strong>Менеджер:</strong>
         <select name="oper_id" id="oper_id">

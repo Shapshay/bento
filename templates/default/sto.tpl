@@ -406,7 +406,7 @@
         <p><button type="button" class="btn_pero" onclick="javascript:window.location='system.php?menu=225';">Расчет налога</button>
             <button type="button" class="btn_pero" onclick="javascript:window.location='system.php?menu=229';">Проверка штрафов</button>
             <button type="button" class="btn_pero" onclick="javascript:showDocs();">Документы</button></p>
-        <p><button type="button" class="btn_pero" onclick="javascript:showMyCalls();">Мои звонки</button>
+        <p><!--<button type="button" class="btn_pero" onclick="javascript:showMyCalls();">Мои звонки</button>-->
             <button type="button" class="btn_pero" onclick="javascript:showGnTech();">Проверка тех.осмотра</button></p>
     </div>
 </div>

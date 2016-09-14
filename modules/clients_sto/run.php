@@ -78,7 +78,7 @@ if(isset($_POST['res_call_id'])){
                 "date_call" => 'NOW()'));
             $row5 = $dbc->element_find('sto',$c_id);
             if(date("Ymd",strtotime($row5['date_dog']))==date("Ymd")){
-                $sms_body = urlencode('Напоминаем, что на сегодня у Вас запланирован тех.осмотр. Автоклуб');
+                $sms_body = urlencode('Тех.осмотр со скидкой 20%.Адрес: Мирзояна 112/2,тел:87718488098.Автоклуб');
                 $sms_url = "http://smsc.kz//sys/send.php?login=Tigay84@list.ru&psw=94120593&&phones=".$row5['phone']."&charset=utf-8&mes=".$sms_body;
                 $result = get_web_page( $sms_url );
             }

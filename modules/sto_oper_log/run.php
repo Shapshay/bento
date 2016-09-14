@@ -1,41 +1,21 @@
 <?php
 # SETTINGS #############################################################################
 
-$moduleName = "s_oper_log";
+$moduleName = "sto_oper_log";
 
 $prefix = "./modules/".$moduleName."/";
 
 $tpl->define(array(
 	$moduleName => $prefix . $moduleName.".tpl",
 	$moduleName . "main" => $prefix . "main.tpl",
-	$moduleName . "r_add" => $prefix . "r_add.tpl",
-	$moduleName . "r_edit" => $prefix . "r_edit.tpl",
 	$moduleName . "grid" => $prefix . "grid.tpl",
-	$moduleName . "grid2" => $prefix . "grid2.tpl",
 	$moduleName . "grid3" => $prefix . "grid3.tpl",
-	$moduleName . "baned_r" => $prefix . "baned_r.tpl",
-	$moduleName . "baned_r2" => $prefix . "baned_r2.tpl",
-	$moduleName . "rights" => $prefix . "rights.tpl",
-	$moduleName . "rights_row" => $prefix . "rights_row.tpl",
-	$moduleName . "ch_row" => $prefix . "ch_row.tpl",
 	$moduleName . "view" => $prefix . "view.tpl",
-	$moduleName . "frodo_row" => $prefix . "frodo_row.tpl",
-	$moduleName . "frodo2_row" => $prefix . "frodo2_row.tpl",
-	$moduleName . "oper_row" => $prefix . "oper_row.tpl",
-	$moduleName . "log_call_row" => $prefix . "log_call_row.tpl",
-	$moduleName . "oper_log_row" => $prefix . "oper_log_row.tpl",
 	$moduleName . "oper_log_calls_row" => $prefix . "oper_log_calls_row.tpl",
 ));
 
-$size_x = 200;
-$size_y = 200;
-$size_x2 = 50;
-$size_y2 = 50;
-$group_id = 1;
-$out = '';
-$maxFileSize = 500000;
 
-$_order = " ORDER BY data_reg DESC";				// ������� ����������
+$_order = " ORDER BY data_reg DESC";
 $_anonsCount = 50;
 
 # MAIN #################################################################################
@@ -108,9 +88,8 @@ switch ($_GET['act']) {
 		$tpl->assign("EDT_DATE_END", date("d-m-Y"));
 		$res_calls='';
 		$rows = $dbc->dbselect(array(
-				"table"=>"res_calls",
-				"select"=>"id, title",
-				"where"=>"view=1"
+				"table"=>"sto_res_call",
+				"select"=>"id, title"
 			)
 		);
 		foreach($rows as $row){
@@ -130,7 +109,7 @@ switch ($_GET['act']) {
 		);
 		foreach($rows as $row){
 			$this_role = explode(",",$row['role']);
-			if(in_array(1,$this_role)){
+			if(in_array(11,$this_role)){
 				$oper_rows.='<option value="'.$row['id'].'">'.$row['name'];
 			}
 		}

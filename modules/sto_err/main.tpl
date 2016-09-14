@@ -2,7 +2,7 @@
 <hr align="left" width="100%" noshade color="#983736" size="1">
 <p>
 <p>
-<h2>POST-контроль</h2>
+<h2>СТО-контроль</h2>
 <div id="stat_page">
     <p>
         <form method="post" name="s_s">

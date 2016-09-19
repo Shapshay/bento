@@ -118,25 +118,7 @@ if(isset($_POST['res_call_id'])){
 		'trace' => true
 		)
 	);
-	/*if($_POST['call_lenght']>0){
-		$call_lenght = $_POST['call_lenght'];
-	}
-	else{
-		$call_lenght = 0;
-	}*/
-    /*$rows = $dbc->dbselect(array(
-            "table"=>"sto",
-            "select"=>"sto_res_call.title as res_call,
-                sto_tochka.title as sto_title,
-				IFNULL(sto_res_err.title,'---') as cour_err",
-            "joins"=>"LEFT OUTER JOIN sto_res_call ON sto.res_call_id = sto_res_call.id
-                LEFT OUTER JOIN sto_res_err ON sto.err_res_id = sto_res_err.id
-                LEFT OUTER JOIN sto_tochka ON sto.sto_tochka_id = sto_tochka.id",
-            "where"=>"sto.id = ".$c_id,
-            "limit"=>1
-        )
-    );
-    $row = $rows[0];*/
+	
     if($_POST['res_call_id']==5){
         $res_err = $_POST['err_res_id'];
     }

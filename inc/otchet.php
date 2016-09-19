@@ -926,7 +926,7 @@ $rows = $dbc->dbselect(array(
             SUM(CASE WHEN sto.res_call_id='4' THEN 1 ELSE 0 END) as status4,
             SUM(CASE WHEN sto.res_call_id='5' THEN 1 ELSE 0 END) as status5",
     "where"=>"DATE_FORMAT(sto.date_call,'%Y%m%d')='".date("Ymd")."'",
-    "group"=>"date_call"));
+    "group"=>"DATE_FORMAT(sto.date_call,'%Y%m%d')"));
 
 
 
